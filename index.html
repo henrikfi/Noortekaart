@@ -1,69 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map</title>
+    <title>Leaflet Map - Masking Rest of the World</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="BoundaryCanvas.js"></script>
+    <script src="https://unpkg.com/leaflet-boundary-canvas/dist/boundaryCanvas.min.js"></script>
+<style>
+#map {
+height: 600px;
+@@ -40,34 +40,38 @@
+<div id="map"></div>
+<div id="legend">
+<h4>Legend</h4>
+        <div><i style="background:green"></i>Kool</div>
+        <div><i style="background:red"></i>Noortekeskus</div>
+        <div><i style="background:green"></i> Kool</div>
+        <div><i style="background:red"></i> Noortekeskus</div>
+</div>
+<div id="filter">
+<label><input type="checkbox" id="filter-kool" checked> Kool</label><br>
+<label><input type="checkbox" id="filter-noortekeskus" checked> Noortekeskus</label><br>
+</div>
 <script>
-    // Initialize the map
-    var map = L.map('map').setView([58.5953, 25.0136], 7);
+        // Initialize the map
+var map = L.map('map').setView([58.5953, 25.0136], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
-    // BoundaryCanvas Layer
-    fetch('estonia.json')
-        .then(response => response.json())
-        .then(geojson => {
-            // Add BoundaryCanvas to only show Estonia
-            var boundaryLayer = L.TileLayer.boundaryCanvas('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                boundary: geojson,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            // Check if the geojson loads correctly
-            if (!geojson || !geojson.features || geojson.features.length === 0) {
-                console.error("Invalid GeoJSON file. Ensure it contains valid geometries.");
-                return;
-            }
-
-            // Fit the map to Estonia's boundary
-            var geoJsonLayer = L.geoJSON(geojson);
-            map.fitBounds(geoJsonLayer.getBounds());
-
-            // Optional: Add an outline for visual confirmation
-            L.geoJSON(geojson, {
-                style: {
-                    color: "blue",
-                    weight: 2,
-                    fillColor: "#cce5ff",
-                    fillOpacity: 0.4
-                }
-            }).addTo(map);
-        })
-        .catch(error => {
-            console.error("Error loading GeoJSON:", error);
+        // Add tile layer
+        var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+maxZoom: 19,
+attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
         });
 
-    // Marker Logic
-    var markers = {
-        "Kool": [],
-        "Noortekeskus": []
-    };
+        // Load GeoJSON and create boundary canvas
+fetch('estonia.json')
+.then(response => response.json())
+.then(geojson => {
+                // Define the BoundaryCanvas layer
+                var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                var osmLayer = L.TileLayer.boundaryCanvas(osmUrl, {
+                // BoundaryCanvas plugin layer
+                var boundaryLayer = L.TileLayer.boundaryCanvas('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+boundary: geojson,
+attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                });
+                map.addLayer(boundaryLayer);
 
-    var marker1 = L.marker([58.5, 24.8]).bindPopup("Kool näidis");
-    markers["Kool"].push(marker1);
+// Fit the map to the boundary
+map.fitBounds(L.geoJSON(geojson).getBounds());
 
-    var marker2 = L.marker([59.4, 25.3]).bindPopup("Noortekeskus näidis");
-    markers["Noortekeskus"].push(marker2);
+                // Add the GeoJSON layer for styling
+                // Optional: Add an outline for the country
+L.geoJSON(geojson, {
+style: {
+color: "blue",
+@@ -78,6 +82,7 @@ <h4>Legend</h4>
+}).addTo(map);
+});
 
-    markers["Kool"].forEach(m => m.addTo(map));
-    markers["Noortekeskus"].forEach(m => m.addTo(map));
-
-    document.getElementById('filter-kool').addEventListener('change', function(e) {
-        if (e.target.checked) {
-            markers["Kool"].forEach(m => map.addLayer(m));
-        } else {
-            markers["Kool"].forEach(m => map.removeLayer(m));
-        }
-    });
-
-    document.getElementById('filter-noortekeskus').addEventListener('change', function(e) {
-        if (e.target.checked) {
-            markers["Noortekeskus"].forEach(m => map.addLayer(m));
-        } else {
-            markers["Noortekeskus"].forEach(m => map.removeLayer(m));
-        }
-    });
-</script>
+        // Markers with filters
+var markers = {
+"Kool": [],
+"Noortekeskus": []
