@@ -28,10 +28,13 @@
     <div id="map"></div>
     <div id="legend">
         <h4>Legend</h4>
-        <div><span style="background-color: red; width: 10px; height: 10px; display: inline-block; margin-right: 5px;"></span> Example Point 1</div>
-        <div><span style="background-color: green; width: 10px; height: 10px; display: inline-block; margin-right: 5px;"></span> Example Point 2</div>
-        <div><span style="background-color: blue; width: 10px; height: 10px; display: inline-block; margin-right: 5px;"></span> Estonia Boundary</div>
-    </div>
+        <div><i style="background:green"></i>Kool</div>
+        <div><i style="background:red"></i> Noortekeskus</div>
+       </div>
+    <div id="filter">
+        <label><input type="checkbox" id="filter-kool" checked> Kool</label><br>
+        <label><input type="checkbox" id="filter-noortekeskus" checked> Noortekeskus</label><br>
+        </div>
     <script>
         var map = L.map('map').setView([58.5953, 25.0136], 7);
 
@@ -54,12 +57,40 @@
 
                 map.fitBounds(L.geoJSON(geojson).getBounds());
             });
+        var bounds = L.latLngBounds(
+            L.latLng(53.0, 10.0),  // Southwest corner
+            L.latLng(66.0, 32.0)   // Northeast corner
+        );
 
-        var example1 = L.marker([59.4370, 24.7536]).addTo(map);
-        example1.bindPopup("<b>Example Point 1</b><br>This is an example.");
+        map.setMaxBounds(bounds);
+        map.fitBounds(bounds);
+        var markers = {
+            "Kool": [],
+            "Noortekeskus": []
+        };
+        var marker1 = L.marker([58.5, 24.8]).bindPopup("Kool näidis");
+            markers["Kool"].push(marker1);
 
-        var example2 = L.marker([58.3776, 26.7290]).addTo(map);
-        example2.bindPopup("<b>Example Point 2</b><br>This is another example.");
+        var marker2 = L.marker([59.4, 25.3]).bindPopup("Noortekeskus näidis");
+            markers["Noortekeskus"].push(marker2);
+
+        markers["Kool"].forEach(m => m.addTo(map));
+        markers["Noortekeskus"].forEach(m => m.addTo(map));
+
+        document.getElementById('filter-kool').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                markers["Kool"].forEach(m => map.addLayer(m));
+            } else {
+                markers["Kool"].forEach(m => map.removeLayer(m));
+            }
+        });
+        document.getElementById('filter-noortekeskus').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                markers["Noortekeskus"].forEach(m => map.addLayer(m));
+            } else {
+                markers["Noortekeskus"].forEach(m => map.removeLayer(m));
+            }
+        });
     </script>
 </body>
 </html>
