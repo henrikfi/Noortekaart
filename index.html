@@ -9,25 +9,57 @@
             height: 600px;
             width: 100%;
         }
+
+        #legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            font-size: 14px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="legend">
+        <h4>Legend</h4>
+        <div><span style="background-color: red; width: 10px; height: 10px; display: inline-block; margin-right: 5px;"></span> Example Point 1</div>
+        <div><span style="background-color: green; width: 10px; height: 10px; display: inline-block; margin-right: 5px;"></span> Example Point 2</div>
+        <div><span style="background-color: blue; width: 10px; height: 10px; display: inline-block; margin-right: 5px;"></span> Estonia Boundary</div>
+    </div>
     <script>
-        // Initialize the map and set the view to Estonia
         var map = L.map('map').setView([58.5953, 25.0136], 7);
 
-        // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Add a marker
-        var marker = L.marker([59.4370, 24.7536]).addTo(map);
-        marker.bindPopup("<b>Tallinn</b><br>Capital of Estonia.").openPopup();
+        fetch('estonia.json')
+            .then(response => response.json())
+            .then(geojson => {
+                L.geoJSON(geojson, {
+                    style: {
+                        color: "blue",
+                        weight: 2,
+                        fillColor: "#cce5ff",
+                        fillOpacity: 0.4
+                    }
+                }).addTo(map);
 
-        // Add more markers as needed
+                map.fitBounds(L.geoJSON(geojson).getBounds());
+            });
+
+        var example1 = L.marker([59.4370, 24.7536]).addTo(map);
+        example1.bindPopup("<b>Example Point 1</b><br>This is an example.");
+
+        var example2 = L.marker([58.3776, 26.7290]).addTo(map);
+        example2.bindPopup("<b>Example Point 2</b><br>This is another example.");
     </script>
 </body>
 </html>
