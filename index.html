@@ -49,10 +49,14 @@
     </div>
     <script>
         var map = L.map('map').setView([58.5953, 25.0136], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://tiles.maaamet.ee/tm/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
+            attribution: '© Maa-amet'
         }).addTo(map);
+        map.setMaxBounds([
+            [54, 20],  // Southwest corner (Lat, Lon)
+            [65, 30]   // Northeast corner (Lat, Lon)
+        ]);
 
         fetch('estonia.json')
             .then(response => response.json())
