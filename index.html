@@ -4,6 +4,7 @@
     <title>Leaflet Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="BoundaryCanvas.js"></script>
     <style>
         #map {
             height: 600px;
@@ -43,9 +44,20 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        fetch('estonia.json')
+                fetch('estonia.json')
             .then(response => response.json())
             .then(geojson => {
+                // Define the BoundaryCanvas layer
+                var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                var osmLayer = L.TileLayer.boundaryCanvas(osmUrl, {
+                    boundary: geojson,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Fit the map to the boundary
+                map.fitBounds(L.geoJSON(geojson).getBounds());
+
+                // Add the GeoJSON layer for styling
                 L.geoJSON(geojson, {
                     style: {
                         color: "blue",
@@ -54,9 +66,8 @@
                         fillOpacity: 0.4
                     }
                 }).addTo(map);
-
-                map.fitBounds(L.geoJSON(geojson).getBounds());
             });
+        
         var bounds = L.latLngBounds(
             L.latLng(53.0, 10.0),  // Southwest corner
             L.latLng(66.0, 32.0)   // Northeast corner
