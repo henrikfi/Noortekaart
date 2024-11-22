@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Map</title>
+    <title>Leaflet Map - Masking Rest of the World</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="BoundaryCanvas.js"></script>
+    <script src="https://unpkg.com/leaflet-boundary-canvas/dist/boundaryCanvas.min.js"></script>
     <style>
         #map {
             height: 600px;
@@ -40,34 +40,38 @@
     <div id="map"></div>
     <div id="legend">
         <h4>Legend</h4>
-        <div><i style="background:green"></i>Kool</div>
-        <div><i style="background:red"></i>Noortekeskus</div>
+        <div><i style="background:green"></i> Kool</div>
+        <div><i style="background:red"></i> Noortekeskus</div>
     </div>
     <div id="filter">
         <label><input type="checkbox" id="filter-kool" checked> Kool</label><br>
         <label><input type="checkbox" id="filter-noortekeskus" checked> Noortekeskus</label><br>
     </div>
     <script>
+        // Initialize the map
         var map = L.map('map').setView([58.5953, 25.0136], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+        // Add tile layer
+        var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        });
 
+        // Load GeoJSON and create boundary canvas
         fetch('estonia.json')
             .then(response => response.json())
             .then(geojson => {
-                // Define the BoundaryCanvas layer
-                var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                var osmLayer = L.TileLayer.boundaryCanvas(osmUrl, {
+                // BoundaryCanvas plugin layer
+                var boundaryLayer = L.TileLayer.boundaryCanvas('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     boundary: geojson,
                     attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
+                });
+                map.addLayer(boundaryLayer);
 
                 // Fit the map to the boundary
                 map.fitBounds(L.geoJSON(geojson).getBounds());
 
-                // Add the GeoJSON layer for styling
+                // Optional: Add an outline for the country
                 L.geoJSON(geojson, {
                     style: {
                         color: "blue",
@@ -78,6 +82,7 @@
                 }).addTo(map);
             });
 
+        // Markers with filters
         var markers = {
             "Kool": [],
             "Noortekeskus": []
