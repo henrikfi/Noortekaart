@@ -10,10 +10,9 @@
             height: 600px;
             width: 100%;
         }
-
         #legend {
             position: absolute;
-            bottom: 20px;
+            top: 20px;
             left: 20px;
             z-index: 1000;
             font-size: 14px;
@@ -30,28 +29,27 @@
     <div id="legend">
         <h4>Legend</h4>
         <div><i style="background:green"></i>Kool</div>
-        <div><i style="background:red"></i> Noortekeskus</div>
-       </div>
+        <div><i style="background:red"></i>Noortekeskus</div>
+    </div>
     <div id="filter">
         <label><input type="checkbox" id="filter-kool" checked> Kool</label><br>
         <label><input type="checkbox" id="filter-noortekeskus" checked> Noortekeskus</label><br>
-        </div>
+    </div>
     <script>
         var map = L.map('map').setView([58.5953, 25.0136], 7);
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-                fetch('estonia.json')
+        fetch('estonia.json')
             .then(response => response.json())
             .then(geojson => {
                 // Define the BoundaryCanvas layer
                 var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
                 var osmLayer = L.TileLayer.boundaryCanvas(osmUrl, {
                     boundary: geojson,
-                    attribution: '&copy; OpenStreetMap contributors'
+                    attribution: '© OpenStreetMap contributors'
                 }).addTo(map);
 
                 // Fit the map to the boundary
@@ -67,23 +65,17 @@
                     }
                 }).addTo(map);
             });
-        
-        var bounds = L.latLngBounds(
-            L.latLng(53.0, 10.0),  // Southwest corner
-            L.latLng(66.0, 32.0)   // Northeast corner
-        );
 
-        map.setMaxBounds(bounds);
-        map.fitBounds(bounds);
         var markers = {
             "Kool": [],
             "Noortekeskus": []
         };
+
         var marker1 = L.marker([58.5, 24.8]).bindPopup("Kool näidis");
-            markers["Kool"].push(marker1);
+        markers["Kool"].push(marker1);
 
         var marker2 = L.marker([59.4, 25.3]).bindPopup("Noortekeskus näidis");
-            markers["Noortekeskus"].push(marker2);
+        markers["Noortekeskus"].push(marker2);
 
         markers["Kool"].forEach(m => m.addTo(map));
         markers["Noortekeskus"].forEach(m => m.addTo(map));
@@ -95,6 +87,7 @@
                 markers["Kool"].forEach(m => map.removeLayer(m));
             }
         });
+
         document.getElementById('filter-noortekeskus').addEventListener('change', function(e) {
             if (e.target.checked) {
                 markers["Noortekeskus"].forEach(m => map.addLayer(m));
