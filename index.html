@@ -12,7 +12,7 @@
         }
         #legend {
             position: absolute;
-            top: 20px;
+            top: 100px;
             left: 20px;
             z-index: 1000;
             font-size: 14px;
@@ -58,10 +58,9 @@
             .then(response => response.json())
             .then(geojson => {
                 // Define the BoundaryCanvas layer
-                var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                var osmLayer = L.TileLayer.boundaryCanvas(osmUrl, {
-                    boundary: geojson,
-                    attribution: '© OpenStreetMap contributors'
+                L.tileLayer('https://tiles.maaamet.ee/tm/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© Maa-amet'
                 }).addTo(map);
 
                 // Fit the map to the boundary
